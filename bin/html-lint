@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+
+var glob = require('glob')
+var fs = require('fs')
+
+var inDouble = false
+var inSingle = false
+var reg = /[a-zA-Z(]/
+
+glob('**/*.html', function(_, files) {
+  var all, data
+  files.forEach(function(filename) {
+    all = []
+    data = fs.readFileSync(filename)
+    all.push(processChunk(data))
+    fs.writeFileSync(filename, all)
+  })
+})
+
+function processChunk(data) {
+  var code = 0, prev = 0
+  for (var i = 0; i < data.length; i++) {
+    code = data[i]
+    if (code === 34) {
+      if (inSingle) data[i] = 39
+      inDouble = inDouble ? false : true
+    }
+    else if (code === 39) {
+      prev = data[i - 1]
+      if (!inSingle && reg.test(String.fromCharCode(prev))) continue
+      if (!inDouble) data[i] = 34
+      inSingle = inSingle ? false: true
+    }
+  }
+  return data
+}
