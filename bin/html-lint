@@ -1,36 +1,28 @@
-#!/usr/bin/env node
+#!/usr/bin/env lsc
 
-var glob = require('glob')
-var fs = require('fs')
+glob = require 'glob'
+fs = require 'fs'
 
-var inDouble = false
-var inSingle = false
-var reg = /[a-zA-Z(]/
+in-double = false
+in-single = false
+reg = /[a-zA-Z(]/
 
-glob('**/*.html', function(_, files) {
-  var all, data
-  files.forEach(function(filename) {
-    all = []
-    data = fs.readFileSync(filename)
-    all.push(processChunk(data))
-    fs.writeFileSync(filename, all)
-  })
-})
+glob '**/*.html' (_, files) ->
+  files.for-each (filename) ->
+    all = []; data = fs.read-file-sync filename
+    all.push process-chunk data
+    fs.write-file-sync filename, all
 
-function processChunk(data) {
-  var code = 0, prev = 0
-  for (var i = 0; i < data.length; i++) {
+process-chunk = (data) ->
+  code = 0; prev = 0; i = 0
+  while i++ < data.length
     code = data[i]
-    if (code === 34) {
-      if (inSingle) data[i] = 39
-      inDouble = !inDouble
-    }
-    else if (code === 39) {
+    if code is 34
+      data[i] = 39 if in-single
+      in-double = not in-double
+    else if code is 39
       prev = data[i - 1]
-      if (!inSingle && reg.test(String.fromCharCode(prev))) continue
-      if (!inDouble) data[i] = 34
-      inSingle = !inSingle
-    }
-  }
+      continue if not in-single and reg.test String.from-char-code prev
+      data[i] = 34 if not in-double
+      in-single = not in-single
   return data
-}
