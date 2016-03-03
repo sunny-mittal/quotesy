@@ -23,13 +23,13 @@ function processChunk(data) {
     code = data[i]
     if (code === 34) {
       if (inSingle) data[i] = 39
-      inDouble = inDouble ? false : true
+      inDouble = !inDouble
     }
     else if (code === 39) {
       prev = data[i - 1]
       if (!inSingle && reg.test(String.fromCharCode(prev))) continue
       if (!inDouble) data[i] = 34
-      inSingle = inSingle ? false: true
+      inSingle = !inSingle
     }
   }
   return data
